@@ -1,22 +1,24 @@
 ## Open Wide Nuxeo Project boilerplate
 
-**Work in progress**
+**!! Work in progress !!**
 
 This repository will provide:
 
 * A set of Nuxeo projects, including Nuxeo Marketplace packaging project, to quickly get started
 * A command-line tool to help initializing, building, deploying, running and distributing your Nuxeo app
 
-## Installing the `ow-nuxeo` tool
+### Installing the `ow-nuxeo` tool
 
 1. Make sure you have [Ruby](http://www.ruby-lang.org/fr/) & [RubyGems](http://rubygems.org/pages/download) installed.
-2. Install the tool by running:
+2. Run:
 
-    sudo gem install ow-nuxeo
+```
+sudo gem install ow-nuxeo
+```
     
-## Using `ow-nuxeo`
+### Using `ow-nuxeo`
 
-You will have to configure, at the root of your project, a `nuxeo-config.rb` file following this example:
+You will have to create, at the root of your project, a `nuxeo-config.rb` config file following this example:
 
 ```
 # Target custom Nuxeo
@@ -27,4 +29,4 @@ MARKETPLACE_PROJECT_PATH = './myproject-distribution'
 MARKETPLACE_PACKAGE_NAME = 'myproject'
 ```
 
-Then run `ow-nuxeo` once to view its help.
+Then run `ow-nuxeo` once (again, from the root of your project) to view its help.
