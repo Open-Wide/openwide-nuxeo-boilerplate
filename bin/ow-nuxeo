@@ -1,0 +1,112 @@
+#!/usr/bin/env ruby
+
+# WARNING: Script is Linux/Cygwin-dependant
+
+require 'fileutils'
+require 'net/http'
+
+begin
+  require './nuxeo-config.rb'
+rescue LoadError
+  puts "!!! WARNING: 'nuxeo-config.rb' is missing. Using default config.\n\n"
+  begin
+    require './nuxeo-config.default.rb'
+  rescue LoadError
+    defaultConfig = File.new("nuxeo-config.default.rb", "w")
+    defaultConfig.puts "# Target custom Nuxeo\nNUXEO_PATH = '/data/services/nuxeo/'\n\n\# Distrib config\nMARKETPLACE_PROJECT_PATH = './unibail-dm-distribution'\nMARKETPLACE_PACKAGE_NAME = 'unibail-dm'\n"
+    defaultConfig.close
+    puts "\nABORTING: Created default config file './nuxeo-config.default.rb',"
+    puts "Please copy it customize it to fit your project."
+    exit 0
+  end
+end
+
+def nuxeoctl()
+  if defined? NUXEO_PATH
+    path = Dir[NUXEO_PATH + 'bin/nuxeoctl'][0]
+  end
+  if path == nil
+    puts "ERROR, is the Nuxeo path (in 'nuxeo-config.rb') defined correctly?"
+    exit 0
+  else
+    return path
+  end
+end 
+
+def displayHelp()
+  puts '> EXAMPLES'
+  puts 'ow-nuxeo build'
+  puts 'ow-nuxeo fastbuild deploy run'
+  puts 'ow-nuxeo version 1.0.0'
+  puts 'ow-nuxeo release'
+  puts ''
+  puts '> AVAILABLE GOALS'
+  puts 'build             : Build with tests.'
+  puts 'fastbuild         : Build, skip the tests to go faster'
+  puts 'fastestbuild      : Build, skip the tests and run offline to go faster (consequence: won\'t update any SNAPSHOT from remote repos, like NxStudio plugins)'
+  puts 'release           : Build with tests and the "release" flag enabled, to enable the use of the tagged NxStudio plugin'
+  puts 'version [VERSION] : Updates the modules version. Specify the new version number as the second parameter.'
+  puts 'test              : Run the Maven tests only, in debug mode'
+  puts 'deploy            : Deploy the marketplace package'
+  puts 'reset             : Reset the data of your custom Nuxeo (by deleting the nxserver/data folder, i.e. it only works with Derby/H2)'
+  puts 'run               : Runs Nuxeo'
+  puts ''
+end
+
+ARGV.each do |arg|
+
+  case arg
+ 
+    when 'test'
+      system('mvnDebug -DforkMode=never test')
+      
+    when 'build'
+      system('mvn clean install')
+      
+    when 'fastbuild'
+      system('mvn clean install -DskipTests=true')
+      
+    when 'fastestbuild'
+      system('mvn clean install -DskipTests=true -o')
+    
+    when 'version'
+      system('mvn versions:set -DnewVersion=' + ARGV[1])
+      break
+    
+    when 'release'
+      system('mvn clean install -Drelease')
+    
+    when 'deploy'
+      nuxeoctlPath = nuxeoctl()
+      system('chmod +x ' + nuxeoctlPath)
+      
+      puts '> Uninstalling package "' + MARKETPLACE_PACKAGE_NAME + '"...'
+      system(nuxeoctlPath + ' --accept=true mp-remove ' + MARKETPLACE_PACKAGE_NAME)
+      
+      puts '', '> Installing new marketplace package...'
+      system(nuxeoctlPath + ' --accept=true mp-install ' + Dir[MARKETPLACE_PROJECT_PATH + '/target/' + PROJECT_NAME + '-*.zip'][0])
+     
+    when 'run'
+      system(nuxeoctl() + ' console')
+    
+    when 'reset'
+      if defined? NUXEO_PATH
+        deletePath = Dir[NUXEO_PATH + 'nxserver/data'][0]
+      end
+      if !deletePath.nil?
+        puts '> Deleting', deletePath
+        FileUtils.rm_r deletePath, :force => true
+      else
+        puts '> Nothing to delete'
+      end
+      
+    else
+      displayHelp()
+      
+  end
+  
+end
+
+if ARGV.empty?
+  displayHelp()
+end
