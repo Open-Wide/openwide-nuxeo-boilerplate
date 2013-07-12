@@ -1,4 +1,4 @@
-## Open Wide Nuxeo Project boilerplate
+## Open Wide Nuxeo boilerplate
 
 **!! Work in progress !!**
 
