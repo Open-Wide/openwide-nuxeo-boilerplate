@@ -5,7 +5,7 @@
 This repository will provide:
 
 * A set of Nuxeo projects, including Nuxeo Marketplace packaging project, to quickly get started
-* A command-line tool to help initializing, building, deploying, running and distributing your Nuxeo app
+* A [command-line tool](https://rubygems.org/gems/ow-nuxeo) to help initializing, building, deploying, running and distributing your Nuxeo app
 
 ### Installing the `ow-nuxeo` tool
 
