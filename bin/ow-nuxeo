@@ -13,7 +13,7 @@ rescue LoadError
     require './nuxeo-config.default.rb'
   rescue LoadError
     defaultConfig = File.new("nuxeo-config.default.rb", "w")
-    defaultConfig.puts "# Target custom Nuxeo\nNUXEO_PATH = '/data/services/nuxeo/'\n\n\# Distrib config\nMARKETPLACE_PROJECT_PATH = './unibail-dm-distribution'\nMARKETPLACE_PACKAGE_NAME = 'unibail-dm'\n"
+    defaultConfig.puts "# Target custom Nuxeo\nNUXEO_PATH = '/data/services/nuxeo/'\n\n\# Distrib config\nMARKETPLACE_PROJECT_PATH = './myproject-distribution'\nMARKETPLACE_PACKAGE_NAME = 'myproject'\n"
     defaultConfig.close
     puts "\nABORTING: Created default config file './nuxeo-config.default.rb',"
     puts "Please copy it customize it to fit your project."
@@ -84,7 +84,7 @@ ARGV.each do |arg|
       system(nuxeoctlPath + ' --accept=true mp-remove ' + MARKETPLACE_PACKAGE_NAME)
       
       puts '', '> Installing new marketplace package...'
-      system(nuxeoctlPath + ' --accept=true mp-install ' + Dir[MARKETPLACE_PROJECT_PATH + '/target/' + PROJECT_NAME + '-*.zip'][0])
+      system(nuxeoctlPath + ' --accept=true mp-install ' + Dir[MARKETPLACE_PROJECT_PATH + '/target/' + MARKETPLACE_PROJECT_PATH.split('/').last + '-*.zip'][0])
      
     when 'run'
       system(nuxeoctl() + ' console')
