@@ -1,0 +1,19 @@
+<!-- See documentation at http://doc.nuxeo.com/x/HgIz -->
+<package type="addon" name="${artifactId}" version="@VERSION@">
+  <title>${name}</title>
+  <vendor>${vendor}</vendor>
+
+  <installer restart="true" />
+  <uninstaller restart="true" />
+  <nuxeo-validation>none</nuxeo-validation>
+  <production-state>testing</production-state>
+  <supported>false</supported>
+  <platforms>
+    <platform>cap</platform>
+  </platforms>
+  <dependencies>
+    <dependencies>
+      <package>nuxeo-dm</package>
+    </dependencies>
+  </dependencies>
+</package>

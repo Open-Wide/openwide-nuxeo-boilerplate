@@ -1,0 +1,10 @@
+<component name="${moduleId}.core.version">
+
+  <extension target="fr.openwide.commons.utils.jsf.VersionDisplayService" point="config">
+    <config>
+      <versionNumberPrefix>${name} v</versionNumberPrefix>
+      <bundleMatchRegexp>${artifactId}-.*</bundleMatchRegexp>
+    </config>
+  </extension>
+
+</component>
