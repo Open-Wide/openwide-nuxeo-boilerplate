@@ -5,6 +5,8 @@ This boilerplate is targeted toward developers who need to customize Nuxeo for c
 * A Maven archetype to generate a Nuxeo project, complete with its Nuxeo Marketplace module
 * A [command-line tool](https://rubygems.org/gems/ow-nuxeo) to help initializing, building, deploying, running and distributing your Nuxeo project.
 
+[![Gem Version](https://badge.fury.io/rb/ow-nuxeo.png)](http://badge.fury.io/rb/ow-nuxeo)
+
 ### Installing the `ow-nuxeo` tool
 
 1. Make sure you have [Ruby](http://www.ruby-lang.org/fr/) & [RubyGems](http://rubygems.org/pages/download) installed.
