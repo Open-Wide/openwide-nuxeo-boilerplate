@@ -10,7 +10,8 @@
       <id>nuxeo-studio-${artifactId}</id>
       <username>${nuxeoConnectUsername}</username>
       <password>${nuxeoConnectPassword}</password>
-    </server>#end#if($isOpenwideProject != 'false')
+    </server>#end
+    #if($isOpenwideProject != 'false')
     <server>
       <id>OWSI-Nuxeo</id>
       <username>${openwideRepoUsername}</username>

@@ -182,27 +182,27 @@ ARGV.each do |arg|
           print "[OPTIONAL] Nuxeo Connect password >> "
           projectInfo['nuxeoConnectPassword'] = STDIN.gets.strip
         end
+      else
+        projectInfo['nuxeoConnectUsername'] = '';
+        projectInfo['nuxeoConnectPassword'] = '';
       end 
       
       puts "\n\n[3/3] OPEN-WIDE INFORMATION"
       puts "==========================="
       print "Is this an Open Wide project? (y/n, default is 'n') >> "
       projectInfo['isOpenwideProject'] = STDIN.gets.strip
-      case projectInfo['isOpenwideProject']
-        when 'y'
-          projectInfo['isOpenwideProject'] = 'true'
-        else
-          projectInfo['isOpenwideProject'] = 'false'
-      end
+      projectInfo['isOpenwideProject'] = (projectInfo['isOpenwideProject'].downcase == 'y') ? 'true' : 'false'
       if projectInfo['isOpenwideProject'] == 'true'
-        puts "\nThe following variables are used to generate a sample ~/.m2/settings.xml]"
+        puts "\nThe following variables are used to generate a sample ~/.m2/settings.xml."
         print "[OPTIONAL] Open Wide Maven username >> "
         projectInfo['openwideRepoUsername'] = STDIN.gets.strip
-        if !projectInfo['nuxeoConnectUsername'].nil?
+        if !projectInfo['openwideRepoUsername'].nil?
           print "[OPTIONAL] Open Wide Maven password >> "
           projectInfo['openwideRepoPassword'] = STDIN.gets.strip
         end
       else
+        projectInfo['openwideRepoUsername'] = '';
+        projectInfo['openwideRepoPassword'] = '';
         puts "\nWARNING: The generated projects will references some 'openwide-nuxeo-commons' libraries, which are not published in Maven central yet."
         puts "You will have to download and build them from https://github.com/Open-Wide/openwide-nuxeo-commons."
         print "(press ENTER) >> "
@@ -241,6 +241,10 @@ ARGV.each do |arg|
       puts "\n" + generationCommand + "\n\n"
       
       system(generationCommand);
+      
+      puts "\nCOMPLETED"
+      puts "========="
+      puts "Please edit the Nuxeo path in 'nuxeo-config.rb', then you're ready to go."
       
     else
       displayHelp()
