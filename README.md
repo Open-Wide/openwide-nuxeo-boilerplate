@@ -1,11 +1,9 @@
 ## Open Wide Nuxeo boilerplate
 
-**!! Work in progress !!**
+This boilerplate is targeted toward developers who need to customize Nuxeo for client projects. It provides:
 
-This repository will provide:
-
-* A set of Nuxeo projects, including Nuxeo Marketplace packaging project, to quickly get started
-* A [command-line tool](https://rubygems.org/gems/ow-nuxeo) to help initializing, building, deploying, running and distributing your Nuxeo app
+* A Maven archetype to generate a Nuxeo project, complete with its Nuxeo Marketplace module
+* A [command-line tool](https://rubygems.org/gems/ow-nuxeo) to help initializing, building, deploying, running and distributing your Nuxeo project.
 
 ### Installing the `ow-nuxeo` tool
 
@@ -18,15 +16,23 @@ sudo gem install ow-nuxeo
     
 ### Using `ow-nuxeo`
 
-You will have to create, at the root of your project, a `nuxeo-config.rb` config file following this example:
+This command-line tool must be run from the root of your project.
 
 ```
-# Target custom Nuxeo
-NUXEO_PATH = '/data/service/nuxeo/'
+# Run the wizard for creating a new project
+ow-nuxeo init
 
-# Distrib config
-MARKETPLACE_PROJECT_PATH = './myproject-distribution'
-MARKETPLACE_PACKAGE_NAME = 'myproject'
+# Build the project
+ow-nuxeo build
+
+# Build while skipping the tests, then deploy the marketplace package and run Nuxeo
+ow-nuxeo fastbuild deploy run
+
+# Set all modules versions to 1.0.0
+ow-nuxeo setversion 1.0.0
+
+# Build the project with the Nuxeo Studio tag matching the project version
+ow-nuxeo release
 ```
 
-Then run `ow-nuxeo` once (again, from the root of your project) to view its help.
+Type `ow-nuxeo` to view the full help.

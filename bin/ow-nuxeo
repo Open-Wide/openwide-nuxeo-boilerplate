@@ -4,7 +4,7 @@
 
 require 'fileutils'
 
-if ARGV[0] != 'init'
+if ARGV[0] != 'init' && ARGV[0] != 'version'
   begin
     require './nuxeo-config.rb'
   rescue LoadError
@@ -12,17 +12,18 @@ if ARGV[0] != 'init'
     begin
       require './nuxeo-config.default.rb'
     rescue LoadError
-      puts "\nABORTING: Neither 'nuxeo-config.rb' nor './nuxeo-config.default.rb' was found."
-      puts "Please create them by using the following example:"
+      puts "!!! ABORTING: Neither 'nuxeo-config.rb' nor './nuxeo-config.default.rb' was found."
+      puts "Please create them by using the example below. Alternately, you can use 'ow-nuxeo init' to create a new project from scratch."
       puts ""
       puts "============="
       puts "# Nuxeo location"
       puts "#NUXEO_PATH = '/home/username/nuxeo-cap-5.6.0-tomcat/'"
       puts ""
       puts "# Distrib config"
-      puts "MARKETPLACE_PACKAGE_NAME = 'my-project-dm'"
-      puts "MARKETPLACE_PROJECT_PATH = './my-project-dm-distribution'"
+      puts "MARKETPLACE_PACKAGE_NAME = 'my-project'"
+      puts "MARKETPLACE_PROJECT_PATH = './my-project-distribution'"
       puts "============="
+      
       exit 0
     end
   end
@@ -45,7 +46,7 @@ def displayHelp()
   puts 'ow-nuxeo init'
   puts 'ow-nuxeo build'
   puts 'ow-nuxeo fastbuild deploy run'
-  puts 'ow-nuxeo version 1.0.0'
+  puts 'ow-nuxeo setversion 1.0.0'
   puts 'ow-nuxeo release'
   puts ''
   puts '> AVAILABLE GOALS'
@@ -54,11 +55,12 @@ def displayHelp()
   puts 'fastbuild         : Build, skip the tests to go faster'
   puts 'fastestbuild      : Build, skip the tests and run offline to go faster (consequence: won\'t update any SNAPSHOT from remote repos, like NxStudio plugins)'
   puts 'release           : Build with tests and the "release" flag enabled, to enable the use of the tagged NxStudio plugin'
-  puts 'version [VERSION] : Updates the modules version. Specify the new version number as the second parameter.'
+  puts 'setversion [VERSION] : Updates the modules version. Specify the new version number as the second parameter.'
   puts 'test              : Run the Maven tests only, in debug mode'
   puts 'deploy            : Deploy the marketplace package'
   puts 'reset             : Reset the data of your custom Nuxeo (by deleting the nxserver/data folder, i.e. it only works with Derby/H2)'
   puts 'run               : Runs Nuxeo in console mode'
+  puts 'version           : Displays ow-nuxeo version'
   puts ''
 end
 
@@ -78,9 +80,12 @@ ARGV.each do |arg|
     when 'fastestbuild'
       system('mvn clean install -DskipTests=true -o')
     
-    when 'version'
-      system('mvn versions:set -DnewVersion=' + ARGV[1])
-      break
+    when 'setversion'
+      if !ARGV[1].nil?
+        system('mvn versions:set -DnewVersion=' + ARGV[1])
+      else
+        puts "Usage: ow-nuxeo setversion [VERSION]"
+      end
     
     when 'release'
       system('mvn clean install -Drelease')
@@ -108,6 +113,9 @@ ARGV.each do |arg|
       else
         puts '> Nothing to delete'
       end
+      
+    when 'version'
+      puts Gem.loaded_specs['ow-nuxeo'].full_name
       
     when 'init'
       puts "> Building archetype...\n"
