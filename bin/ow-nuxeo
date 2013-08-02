@@ -144,6 +144,10 @@ ARGV.each do |arg|
       
       puts "\n[2/3] NUXEO INFORMATION"
       puts "======================="
+      while projectInfo['nuxeoVersion'].to_s == ''
+        print "Target Nuxeo version (example: '5.6') >> "
+        projectInfo['nuxeoVersion'] = STDIN.gets.strip
+      end
       defaultModuleId = projectInfo['groupId'] + '.' + projectInfo['artifactId']
       print "[OPTIONAL] Module ID (default is '" + defaultModuleId + "') >> "
       projectInfo['nuxeoModuleId'] = STDIN.gets.strip
@@ -218,7 +222,7 @@ ARGV.each do |arg|
           puts key + "=" + value.to_s
         end
         puts "------------"
-        print ">> "
+        print "(press ENTER or set a variable) >> "
         confirm = STDIN.gets.strip
         if confirm.to_s != ''
           kv = confirm.split(' ')
