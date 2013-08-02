@@ -7,7 +7,6 @@
     <version>${version}</version>
     <relativePath>..</relativePath>
   </parent>
-  <groupId>${groupId}</groupId>
   <artifactId>${artifactId}</artifactId>
   <name>${name} : Marketplace distribution</name>
   <packaging>zip</packaging>
