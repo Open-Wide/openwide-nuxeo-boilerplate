@@ -120,16 +120,22 @@ ARGV.each do |arg|
       system(nuxeoctl() + ' console')
     
     when 'reset'
-      if defined? NUXEO_PATH
-        dataPath = NUXEO_PATH + 'nxserver/data/'
-        deletePaths = Dir[dataPath + 'h2', dataPath + 'derby', dataPath + 'binaries']
-      end
-      if !deletePaths.nil? and deletePaths.size > 0
-        puts '> Deleting Nuxeo data...'
-        FileUtils.rm_r deletePaths, :force => true
-        puts 'Done.'
-      else
-        puts 'Nothing to delete.'
+      print "Delete all Nuxeo data ? (y/n, default is 'n') >> "
+      case STDIN.gets.strip.downcase
+        when 'y'
+          if defined? NUXEO_PATH
+            dataPath = NUXEO_PATH + 'nxserver/data/'
+            deletePaths = Dir[dataPath + 'h2', dataPath + 'derby', dataPath + 'binaries']
+          end
+          if !deletePaths.nil? and deletePaths.size > 0
+            puts '> Deleting Nuxeo data...'
+            FileUtils.rm_r deletePaths, :force => true
+            puts 'Done.'
+          else
+            puts 'Nothing to delete.'
+          end
+        else
+          puts "Aborted."
       end
       
     when 'version'
@@ -179,7 +185,7 @@ ARGV.each do |arg|
         projectInfo['vendor'] = defaultVendor
       end
       print "[OPTIONAL] Are you using a Nuxeo Studio project? (y/n, default is 'n') >> "
-      projectInfo['hasStudioProject'] = STDIN.gets.strip
+      projectInfo['hasStudioProject'] = STDIN.gets.strip.downcase
       case projectInfo['hasStudioProject']
         when 'y'
           projectInfo['hasStudioProject'] = 'true'
@@ -212,8 +218,8 @@ ARGV.each do |arg|
       puts "\n\n[3/3] OPEN-WIDE INFORMATION"
       puts "==========================="
       print "Is this an Open Wide project? (y/n, default is 'n') >> "
-      projectInfo['isOpenwideProject'] = STDIN.gets.strip
-      projectInfo['isOpenwideProject'] = (projectInfo['isOpenwideProject'].downcase == 'y') ? 'true' : 'false'
+      projectInfo['isOpenwideProject'] = STDIN.gets.strip.downcase
+      projectInfo['isOpenwideProject'] = (projectInfo['isOpenwideProject'] == 'y') ? 'true' : 'false'
       if projectInfo['isOpenwideProject'] == 'true'
         puts "\nThe following variables are used to generate a sample ~/.m2/settings.xml."
         print "[OPTIONAL] Open Wide Maven username >> "
