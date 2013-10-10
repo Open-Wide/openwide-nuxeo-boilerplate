@@ -49,18 +49,23 @@ def displayHelp()
   puts 'ow-nuxeo setversion 1.0.0'
   puts 'ow-nuxeo release'
   puts ''
-  puts '> AVAILABLE GOALS'
-  puts 'init              : Starts a wizard to create a new Nuxeo project.'
-  puts 'build             : Build with tests.'
-  puts 'fastbuild         : Build, skip the tests to go faster'
-  puts 'fastestbuild      : Build, skip the tests and run offline to go faster (consequence: won\'t update any SNAPSHOT from remote repos, like NxStudio plugins)'
-  puts 'release           : Build with tests and the "release" flag enabled, to enable the use of the tagged NxStudio plugin'
-  puts 'setversion [VERSION] : Updates the modules version. Specify the new version number as the second parameter.'
-  puts 'test              : Run the Maven tests only, in debug mode'
-  puts 'deploy            : Deploy the marketplace package'
-  puts 'reset             : Reset the data of your custom Nuxeo (by deleting the nxserver/data folder, i.e. it only works with Derby/H2)'
-  puts 'run               : Runs Nuxeo in console mode'
-  puts 'version           : Displays ow-nuxeo version'
+  puts '> AVAILABLE GOALS / BUILD'
+  puts 'build          : Full build'
+  puts 'fastbuild      : Build, but skip the tests'
+  puts 'fastestbuild   : Build, but skip the tests and run offline (note: won\'t update any SNAPSHOT from remote repos, like Nuxeo Studio plugins)'
+  puts 'test           : Run the Maven tests only, in debug mode'
+  puts 'release        : Full build with the "release" flag enabled, to enable the use of the tagged NxStudio plugin'
+  puts ''
+  puts '> AVAILABLE GOALS / SERVER CONTROL'
+  puts 'deploy         : Deploy the marketplace package to your instance'
+  puts 'run            : Run Nuxeo in console mode'
+  puts 'reset          : Resets the data of your Derby/H2 server (will only purge the binaries if you\'re using an external database)'
+  puts ''
+  puts '> AVAILABLE GOALS / TOOLS'
+  puts 'init           : Starts a wizard to create a new Nuxeo project.'
+  puts 'getversion     : Returns the current version of your project.'
+  puts 'setversion [V] : Updates the project version (will be reflected on all modules of the root POM). Parameter [V] is the new version number.'
+  puts 'version        : Displays ow-nuxeo version'
   puts ''
 end
 
@@ -79,6 +84,16 @@ ARGV.each do |arg|
       
     when 'fastestbuild'
       system('mvn clean install -DskipTests=true -o')
+    
+    when 'getversion'
+      File.open(MARKETPLACE_PROJECT_PATH + '/pom.xml') do |f|
+        f.any? do |line|
+          if line.include?('<version>')
+            puts line.gsub(/ *<\/?version>/, '')
+            break
+          end
+        end
+      end
     
     when 'setversion'
       if !ARGV[1].nil?
@@ -106,13 +121,15 @@ ARGV.each do |arg|
     
     when 'reset'
       if defined? NUXEO_PATH
-        deletePath = Dir[NUXEO_PATH + 'nxserver/data'][0]
+        dataPath = NUXEO_PATH + 'nxserver/data/'
+        deletePaths = Dir[dataPath + 'h2', dataPath + 'derby', dataPath + 'binaries']
       end
-      if !deletePath.nil?
-        puts '> Deleting', deletePath
-        FileUtils.rm_r deletePath, :force => true
+      if !deletePaths.nil? and deletePaths.size > 0
+        puts '> Deleting Nuxeo data...'
+        FileUtils.rm_r deletePaths, :force => true
+        puts 'Done.'
       else
-        puts '> Nothing to delete'
+        puts 'Nothing to delete.'
       end
       
     when 'version'
