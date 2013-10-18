@@ -51,8 +51,8 @@ def displayHelp()
   puts ''
   puts '> AVAILABLE GOALS / BUILD'
   puts 'build          : Full build'
-  puts 'fastbuild      : Build, but skip the tests'
-  puts 'fastestbuild   : Build, but skip the tests and run offline (note: won\'t update any SNAPSHOT from remote repos, like Nuxeo Studio plugins)'
+  puts 'fastbuild      : Full build, but skip the tests'
+  puts 'fastestbuild   : Build only the changed code, skip the tests, run offline (note: won\'t update any SNAPSHOT from remote repos, like Nuxeo Studio plugins)'
   puts 'test           : Run the Maven tests only, in debug mode'
   puts 'release        : Full build with the "release" flag enabled, to enable the use of the tagged NxStudio plugin'
   puts ''
@@ -83,7 +83,7 @@ ARGV.each do |arg|
       system('mvn clean install -DskipTests=true')
       
     when 'fastestbuild'
-      system('mvn clean install -DskipTests=true -o')
+      system('mvn install -DskipTests=true -o')
     
     when 'getversion'
       File.open(MARKETPLACE_PROJECT_PATH + '/pom.xml') do |f|
