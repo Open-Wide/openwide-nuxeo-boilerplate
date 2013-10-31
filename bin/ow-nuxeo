@@ -111,10 +111,10 @@ ARGV.each do |arg|
       system('chmod +x ' + nuxeoctlPath)
       
       puts '> Uninstalling package "' + MARKETPLACE_PACKAGE_NAME + '"...'
-      system(nuxeoctlPath + ' --accept=true mp-remove ' + MARKETPLACE_PACKAGE_NAME)
+      system(nuxeoctlPath + ' --accept=true --nodeps mp-remove ' + MARKETPLACE_PACKAGE_NAME)
       
       puts '', '> Installing new marketplace package...'
-      system(nuxeoctlPath + ' --accept=true mp-install ' + Dir[MARKETPLACE_PROJECT_PATH + '/target/' + MARKETPLACE_PROJECT_PATH.split('/').last + '-*.zip'][0])
+      system(nuxeoctlPath + ' --accept=true --nodeps mp-install ' + Dir[MARKETPLACE_PROJECT_PATH + '/target/' + MARKETPLACE_PROJECT_PATH.split('/').last + '-*.zip'][0])
      
     when 'run'
       system(nuxeoctl() + ' console')
