@@ -1,6 +1,6 @@
 ## Open Wide Nuxeo boilerplate
 
-This boilerplate is targeted toward developers who need to customize Nuxeo for client projects. It provides:
+This boilerplate is targeted toward developers who need to customize Nuxeo for customer projects. It provides:
 
 * A Maven archetype to generate a Nuxeo project, complete with its Nuxeo Marketplace module
 * A [command-line tool](https://rubygems.org/gems/ow-nuxeo) to help initializing, building, deploying, running and distributing your Nuxeo project.
