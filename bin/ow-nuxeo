@@ -174,7 +174,6 @@ ARGV.each do |arg|
       puts '> ' + command
       puts
       system(command)
-      putHeader 'Nuxeo server terminated'
     
     when 'reset'
       putHeader 'Nuxeo data reset'
