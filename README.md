@@ -1,11 +1,11 @@
 ## Open Wide Nuxeo boilerplate
 
+[![Gem Version](https://badge.fury.io/rb/ow-nuxeo.png)](http://badge.fury.io/rb/ow-nuxeo)
+
 This boilerplate is targeted toward developers who need to customize Nuxeo for customer projects. It provides:
 
 * A Maven archetype to generate a Nuxeo project, complete with its Nuxeo Marketplace module *(1)*
 * A [command-line tool](https://rubygems.org/gems/ow-nuxeo) to help initializing, building, deploying, running and distributing your Nuxeo project.
-
-[![Gem Version](https://badge.fury.io/rb/ow-nuxeo.png)](http://badge.fury.io/rb/ow-nuxeo)
 
 *(1) The Maven archetype isn't stable yet, you might have to adjust a few things by hand after generation.*
 
