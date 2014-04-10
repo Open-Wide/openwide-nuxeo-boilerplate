@@ -4,86 +4,136 @@
 
 require 'fileutils'
 
-if ARGV[0] != 'init' && ARGV[0] != 'version'
-  begin
-    require './nuxeo-config.rb'
-  rescue LoadError
-    puts "!!! WARNING: 'nuxeo-config.rb' is missing. Using default config.\n\n"
-    begin
-      require './nuxeo-config.default.rb'
-    rescue LoadError
-      puts "!!! ABORTING: Neither 'nuxeo-config.rb' nor './nuxeo-config.default.rb' was found."
-      puts "Please create them by using the example below. Alternately, you can use 'ow-nuxeo init' to create a new project from scratch."
-      puts ""
-      puts "============="
-      puts "# Nuxeo location"
-      puts "#NUXEO_PATH = '/home/username/nuxeo-cap-5.6.0-tomcat/'"
-      puts ""
-      puts "# Distrib config"
-      puts "MARKETPLACE_PACKAGE_NAME = 'my-project'"
-      puts "MARKETPLACE_PROJECT_PATH = './my-project-distribution'"
-      puts "============="
-      
-      exit 0
-    end
-  end
-end
-
-def nuxeoctl()
-  if defined? NUXEO_PATH
-    path = Dir[NUXEO_PATH + 'bin/nuxeoctl'][0]
-  end
-  if path == nil
-    puts "ERROR, is the Nuxeo path (in 'nuxeo-config.rb') defined correctly?"
-    exit 0
-  else
-    return path
-  end
-end 
+# Help screen
+# ===========
 
 def displayHelp()
-  puts '> EXAMPLES'
+  putHeader '"ow-nuxeo" Help'
+  puts
+  puts '* EXAMPLES'
   puts 'ow-nuxeo init'
   puts 'ow-nuxeo build'
   puts 'ow-nuxeo fastbuild deploy run'
   puts 'ow-nuxeo setversion 1.0.0'
   puts 'ow-nuxeo release'
   puts ''
-  puts '> AVAILABLE GOALS / BUILD'
+  puts '* AVAILABLE GOALS > MAVEN BUILD'
   puts 'build          : Full build'
   puts 'fastbuild      : Full build, but skip the tests'
-  puts 'fastestbuild   : Build only the changed code, skip the tests, run offline (note: won\'t update any SNAPSHOT from remote repos, like Nuxeo Studio plugins)'
+  puts 'fastestbuild   : Build only the changed code, skip the tests, run offline (note: it won\'t fetch the latest Nuxeo Studio plugin version)'
   puts 'test           : Run the Maven tests only, in debug mode'
-  puts 'release        : Full build with the "release" flag enabled, to enable the use of the tagged NxStudio plugin'
+  puts 'release        : Full build with the "release" flag enabled, to enable the use of the tagged Nuxeo Studio plugin'
   puts ''
-  puts '> AVAILABLE GOALS / SERVER CONTROL'
-  puts 'deploy         : Deploy the marketplace package to your instance'
-  puts 'run            : Run Nuxeo in console mode'
-  puts 'reset          : Resets the data of your Derby/H2 server (will only purge the binaries if you\'re using an external database)'
-  puts ''
-  puts '> AVAILABLE GOALS / TOOLS'
+  puts '* AVAILABLE GOALS > OTHER MAVEN-RELATED GOALS'
   puts 'init           : Starts a wizard to create a new Nuxeo project.'
   puts 'getversion     : Returns the current version of your project.'
   puts 'setversion [V] : Updates the project version (will be reflected on all modules of the root POM). Parameter [V] is the new version number.'
+  puts ''
+  puts '* AVAILABLE GOALS > SERVER CONTROL'
+  puts 'deploy         : Deploy the marketplace package to your instance'
+  puts 'run            : Run Nuxeo in console mode'
+  puts 'reset          : Resets the data of your Derby/H2 server (if you\'re using an external database, it will only purge the binaries)'
+  puts ''
+  puts '* AVAILABLE GOALS > MISC'
   puts 'version        : Displays ow-nuxeo version'
+  puts 'help           : Displays this screen'
   puts ''
 end
 
-ARGV.each do |arg|
+# Utility functions
+# =================
 
+def nuxeoctlPath()
+  if defined? NUXEO_PATH
+    path = Dir[NUXEO_PATH + 'bin/nuxeoctl'][0]
+  end
+  if path == nil
+    putHeader "ERROR: Is the Nuxeo path (in 'nuxeo-config.rb') defined correctly? Aborting."
+    exit -1
+  else
+    return path
+  end
+end 
+
+$firstHeader = true
+def putHeader(title)
+  title = ' ' + title + ' '
+  if $firstHeader
+    $firstHeader = false
+  else
+    puts
+  end
+  puts '=' * title.length
+  puts title
+  puts '=' * title.length
+end
+
+def runCommand(title, command)
+  putHeader 'Running: ' + title + ''
+  puts '> ' + command
+  puts
+  if !system(command)
+    putHeader 'ERROR: A command failed. Aborting.'
+    exit -1
+  end
+end
+
+# Check ow-nuxeo requirements 
+# ===========================
+
+if ARGV[0] != 'init' && ARGV[0] != 'version'
+  begin
+    require './nuxeo-config.rb'
+  rescue LoadError
+    putHeader "WARNING: 'nuxeo-config.rb' is missing. Using default config."
+    begin
+      require './nuxeo-config.default.rb'
+    rescue LoadError
+      putHeader "ERROR: Neither 'nuxeo-config.rb' nor './nuxeo-config.default.rb' was found. Aborting."
+      puts "Please create them by using the example below. Alternately, you can use 'ow-nuxeo init' to create a new project from scratch."
+      puts ""
+      puts "----------------------"
+      puts "# Nuxeo location"
+      puts "#NUXEO_PATH = '/home/username/nuxeo-cap-5.6.0-tomcat/'"
+      puts ""
+      puts "# Distrib config"
+      puts "MARKETPLACE_PACKAGE_NAME = 'my-project'"
+      puts "MARKETPLACE_PROJECT_PATH = './my-project-distribution'"
+      puts "----------------------"
+      exit -1
+    end
+  end
+end
+
+# Command loop
+# ============
+
+ARGV.each do |arg|
   case arg
  
+    # General commands
+    # ================
+ 
+    when 'help'
+      displayHelp()
+      
+    when 'version'
+      puts Gem.loaded_specs['ow-nuxeo'].full_name
+      
+    # Maven commands
+    # ==============
+      
     when 'test'
-      system('mvnDebug -DforkMode=never test')
+      runCommand('Maven tests', 'mvnDebug -DforkMode=never test')
       
     when 'build'
-      system('mvn clean install')
+      runCommand('Full Maven build', 'mvn clean install')
       
     when 'fastbuild'
-      system('mvn clean install -DskipTests=true')
+      runCommand('Maven build without tests', 'mvn clean install -DskipTests=true')
       
     when 'fastestbuild'
-      system('mvn install -DskipTests=true -o')
+      runCommand('Offline Maven build without tests', 'mvn install -DskipTests=true -o')
     
     when 'getversion'
       File.open(MARKETPLACE_PROJECT_PATH + '/pom.xml') do |f|
@@ -97,29 +147,37 @@ ARGV.each do |arg|
     
     when 'setversion'
       if !ARGV[1].nil?
-        system('mvn versions:set -DnewVersion=' + ARGV[1])
+        runCommand('Projects version update', 'mvn versions:set -DnewVersion=' + ARGV[1])
         break
       else
         puts "Usage: ow-nuxeo setversion [VERSION]"
       end
     
     when 'release'
-      system('mvn clean install -Drelease')
+      runCommand('Maven build using matching Studio tag', 'mvn clean install -Drelease')
+    
+    # Nuxeo commands
+    # ==============
     
     when 'deploy'
-      nuxeoctlPath = nuxeoctl()
+      nuxeoctlPath = nuxeoctlPath()
       system('chmod +x ' + nuxeoctlPath)
       
-      puts '> Uninstalling package "' + MARKETPLACE_PACKAGE_NAME + '"...'
-      system(nuxeoctlPath + ' --accept=true --nodeps mp-remove ' + MARKETPLACE_PACKAGE_NAME)
-      
-      puts '', '> Installing new marketplace package...'
-      system(nuxeoctlPath + ' --accept=true --nodeps mp-install ' + Dir[MARKETPLACE_PROJECT_PATH + '/target/' + MARKETPLACE_PROJECT_PATH.split('/').last + '-*.zip'][0])
+      runCommand('Uninstall package "' + MARKETPLACE_PACKAGE_NAME + '"',
+        nuxeoctlPath + ' --accept=true --nodeps mp-remove ' + MARKETPLACE_PACKAGE_NAME)
+      runCommand('Install new marketplace package', 
+        nuxeoctlPath + ' --accept=true --nodeps mp-install ' + Dir[MARKETPLACE_PROJECT_PATH + '/target/' + MARKETPLACE_PROJECT_PATH.split('/').last + '-*.zip'][0])
      
     when 'run'
-      system(nuxeoctl() + ' console')
+      command = nuxeoctlPath() + ' console'
+      putHeader 'Launching Nuxeo in console mode'
+      puts '> ' + command
+      puts
+      system(command)
+      putHeader 'Nuxeo server terminated'
     
     when 'reset'
+      putHeader 'Nuxeo data reset'
       print "Delete all Nuxeo data ? (y/n, default is 'n') >> "
       case STDIN.gets.strip.downcase
         when 'y'
@@ -138,21 +196,23 @@ ARGV.each do |arg|
           puts "Aborted."
       end
       
-    when 'version'
-      puts Gem.loaded_specs['ow-nuxeo'].full_name
-      
+    # Project generation
+    # ==================
+    
     when 'init'
-      puts "> Building archetype...\n"
+      putHeader "Archetype build"
       archetype_path = File.expand_path(File.dirname(__FILE__) + "/../archetype")
       FileUtils.cp_r archetype_path, "tmp_archetype"
       system("mvn clean install -f ./tmp_archetype/pom.xml")
       FileUtils.rm_r "tmp_archetype"
       
-      puts "\n> Gathering project information...\n\n"
+      putHeader "Project information"
       projectInfo = {}
       
+      puts "To instanciate the project, you are being asked a series of questions. You will be able to correct any mistake at the end."
+      puts
       puts "[1/3] MAVEN INFORMATION"
-      puts "======================="
+      puts "-----------------------"
       while projectInfo['groupId'].to_s == ''
         print "Maven group ID (example: 'fr.openwide') >> "
         projectInfo['groupId'] = STDIN.gets.strip
@@ -167,7 +227,7 @@ ARGV.each do |arg|
       end
       
       puts "\n[2/3] NUXEO INFORMATION"
-      puts "======================="
+      puts "-------------------------"
       while projectInfo['nuxeoVersion'].to_s == ''
         print "Target Nuxeo version (example: '5.6') >> "
         projectInfo['nuxeoVersion'] = STDIN.gets.strip
@@ -215,8 +275,8 @@ ARGV.each do |arg|
         projectInfo['nuxeoConnectPassword'] = '';
       end 
       
-      puts "\n\n[3/3] OPEN-WIDE INFORMATION"
-      puts "==========================="
+      puts "\n\n[3/3] OPEN WIDE INFORMATION"
+      puts "-------------------------------"
       print "Is this an Open Wide project? (y/n, default is 'n') >> "
       projectInfo['isOpenwideProject'] = STDIN.gets.strip.downcase
       projectInfo['isOpenwideProject'] = (projectInfo['isOpenwideProject'] == 'y') ? 'true' : 'false'
@@ -228,18 +288,11 @@ ARGV.each do |arg|
           print "[OPTIONAL] Open Wide Maven password >> "
           projectInfo['openwideRepoPassword'] = STDIN.gets.strip
         end
-      else
-        projectInfo['openwideRepoUsername'] = '';
-        projectInfo['openwideRepoPassword'] = '';
-        puts "\nWARNING: The generated projects will references some 'openwide-nuxeo-commons' libraries, which are not published in Maven central yet."
-        puts "You will have to download and build them from https://github.com/Open-Wide/openwide-nuxeo-commons."
-        print "(press ENTER) >> "
-        STDIN.gets
       end 
       
-      puts "\n\nSUMMARY"
-      puts "======="
+      putHeader "Summary"
       puts "Is everything correct? Press ENTER to continue, or type 'variable_name new_value' to change any value (eg. 'name my-project').\n"
+      puts
       begin
         puts "------------"
         for key, value in projectInfo.each
@@ -259,23 +312,19 @@ ARGV.each do |arg|
         end
       end while confirm.to_s != ''
       
-      puts "\n> Generating project...\n\n"
-      
       generationCommand = "mvn archetype:generate -DinteractiveMode=false -DarchetypeGroupId=fr.openwide.nuxeo -DarchetypeArtifactId=openwide-nuxeo-archetype -DarchetypeVersion=1.0.0-SNAPSHOT"
       for key, value in projectInfo.each
         generationCommand += " -D" + key + "=\"" + value.to_s + "\""
       end
       
-      puts "\n" + generationCommand + "\n\n"
+      runCommand('Project generation', generationCommand);
       
-      system(generationCommand);
-      
-      puts "\nCOMPLETED"
-      puts "========="
-      puts "Please edit the Nuxeo path in 'nuxeo-config.rb', then you're ready to go."
+      putHeader "COMPLETED!"
+      puts "The project has been generated in './" + projectInfo['artifactId'].to_s + "'."
+      puts "Please edit the Nuxeo path in './" + projectInfo['artifactId'].to_s + "/nuxeo-config.rb', then you're ready to go."
       
     else
-      displayHelp()
+      putHeader("Unknown goal '" + arg + "'.")
       
   end
   
