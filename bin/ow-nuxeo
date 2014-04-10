@@ -4,42 +4,6 @@
 
 require 'fileutils'
 
-# Help screen
-# ===========
-
-def displayHelp()
-  putHeader '"ow-nuxeo" Help'
-  puts
-  puts '* EXAMPLES'
-  puts 'ow-nuxeo init'
-  puts 'ow-nuxeo build'
-  puts 'ow-nuxeo fastbuild deploy run'
-  puts 'ow-nuxeo setversion 1.0.0'
-  puts 'ow-nuxeo release'
-  puts ''
-  puts '* AVAILABLE GOALS > MAVEN BUILD'
-  puts 'build          : Full build'
-  puts 'fastbuild      : Full build, but skip the tests'
-  puts 'fastestbuild   : Build only the changed code, skip the tests, run offline (note: it won\'t fetch the latest Nuxeo Studio plugin version)'
-  puts 'test           : Run the Maven tests only, in debug mode'
-  puts 'release        : Full build with the "release" flag enabled, to enable the use of the tagged Nuxeo Studio plugin'
-  puts ''
-  puts '* AVAILABLE GOALS > OTHER MAVEN-RELATED GOALS'
-  puts 'init           : Starts a wizard to create a new Nuxeo project.'
-  puts 'getversion     : Returns the current version of your project.'
-  puts 'setversion [V] : Updates the project version (will be reflected on all modules of the root POM). Parameter [V] is the new version number.'
-  puts ''
-  puts '* AVAILABLE GOALS > SERVER CONTROL'
-  puts 'deploy         : Deploy the marketplace package to your instance'
-  puts 'run            : Run Nuxeo in console mode'
-  puts 'reset          : Resets the data of your Derby/H2 server (if you\'re using an external database, it will only purge the binaries)'
-  puts ''
-  puts '* AVAILABLE GOALS > MISC'
-  puts 'version        : Displays ow-nuxeo version'
-  puts 'help           : Displays this screen'
-  puts ''
-end
-
 # Utility functions
 # =================
 
@@ -78,6 +42,47 @@ def runCommand(title, command)
   end
 end
 
+# Help screen
+# ===========
+
+def displayHelp()
+  putHeader '"ow-nuxeo" Help'
+  puts
+  puts '* EXAMPLES'
+  puts 'ow-nuxeo init'
+  puts 'ow-nuxeo build'
+  puts 'ow-nuxeo fastbuild deploy run'
+  puts 'ow-nuxeo setversion 1.0.0'
+  puts 'ow-nuxeo release'
+  puts ''
+  puts '* AVAILABLE GOALS > MAVEN BUILD'
+  puts 'build          : Full build'
+  puts 'fastbuild      : Full build, but skip the tests'
+  puts 'fastestbuild   : Build only the changed code, skip the tests, run offline (note: it won\'t fetch the latest Nuxeo Studio plugin version)'
+  puts 'test           : Run the Maven tests only, in debug mode'
+  puts 'release        : Full build with the "release" flag enabled, to enable the use of the tagged Nuxeo Studio plugin'
+  puts ''
+  puts '* AVAILABLE GOALS > OTHER MAVEN-RELATED GOALS'
+  puts 'init           : Starts a wizard to create a new Nuxeo project.'
+  puts 'getversion     : Returns the current version of your project.'
+  puts 'setversion [V] : Updates the project version (will be reflected on all modules of the root POM). Parameter [V] is the new version number.'
+  puts ''
+  puts '* AVAILABLE GOALS > SERVER CONTROL'
+  puts 'deploy         : Deploy the marketplace package to your instance'
+  puts 'run            : Run Nuxeo in console mode'
+  puts 'reset          : Resets the data of your Derby/H2 server (if you\'re using an external database, it will only purge the binaries)'
+  puts ''
+  puts '* AVAILABLE GOALS > MISC'
+  puts 'version        : Displays ow-nuxeo version'
+  puts 'help           : Displays this screen'
+  puts ''
+end
+
+if ARGV.empty? || ARGV[0] == 'help'
+  displayHelp()
+  exit 0
+end
+
 # Check ow-nuxeo requirements 
 # ===========================
 
@@ -85,7 +90,6 @@ if ARGV[0] != 'init' && ARGV[0] != 'version'
   begin
     require './nuxeo-config.rb'
   rescue LoadError
-    putHeader "WARNING: 'nuxeo-config.rb' is missing. Using default config."
     begin
       require './nuxeo-config.default.rb'
     rescue LoadError
@@ -102,6 +106,7 @@ if ARGV[0] != 'init' && ARGV[0] != 'version'
       puts "----------------------"
       exit -1
     end
+    putHeader "WARNING: 'nuxeo-config.rb' is missing. Using default config."
   end
 end
 
@@ -327,8 +332,4 @@ ARGV.each do |arg|
       
   end
   
-end
-
-if ARGV.empty?
-  displayHelp()
 end
