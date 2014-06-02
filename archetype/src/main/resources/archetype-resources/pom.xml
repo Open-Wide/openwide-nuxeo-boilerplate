@@ -31,11 +31,7 @@
   #if($hasStudioProject != 'false')
   <profiles>
     <profile>
-      <activation>
-        <property>
-          <name>release</name>
-        </property>
-      </activation>
+      <id>release</id>
       <properties>
         <${groupId}.studio.version>${project.version}</${groupId}.studio.version>
       </properties>
