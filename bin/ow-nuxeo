@@ -38,7 +38,7 @@ def runCommand(title, command)
   puts
   if !system(command)
     putHeader 'ERROR: A command failed. Aborting.'
-    exit -1
+    raise 'failed system command'
   end
 end
 
@@ -60,7 +60,7 @@ def displayHelp()
   puts 'fastbuild      : Full build, but skip the tests'
   puts 'fastestbuild   : Build only the changed code, skip the tests, run offline (note: it won\'t fetch the latest Nuxeo Studio plugin version)'
   puts 'test           : Run the Maven tests only, in debug mode'
-  puts 'release        : Full build with the "release" flag enabled, to enable the use of the tagged Nuxeo Studio plugin'
+  puts 'release        : Full build with the "release" profile enabled, to enable the use of the tagged Nuxeo Studio plugin'
   puts ''
   puts '* AVAILABLE GOALS > OTHER MAVEN-RELATED GOALS'
   puts 'init           : Starts a wizard to create a new Nuxeo project.'
@@ -113,6 +113,8 @@ end
 # Command loop
 # ============
 
+begin
+
 ARGV.each do |arg|
   case arg
  
@@ -159,8 +161,19 @@ ARGV.each do |arg|
       end
     
     when 'release'
-      runCommand('Maven build using matching Studio tag', 'mvn clean install -Drelease')
+	  begin
+        runCommand('Maven build using matching Studio tag', 'mvn clean install -U -Prelease')
+      rescue
+		# DEPRECATED support
+		puts "Maybe your project is using the old release system? Try 'ow-nuxeo release-deprecated'."
+		exit -1;
+      end
     
+	# DEPRECATED support
+    when 'release-deprecated'
+        runCommand('Maven build using matching Studio tag (DEPRECATED)', 'mvn clean install -Drelease')
+		putHeader("DEPRECATED: To switch to the new release format, set '<id>release</id>' in your release profile, and remove the 'activation' block.")
+        
     # Nuxeo commands
     # ==============
     
@@ -332,4 +345,8 @@ ARGV.each do |arg|
       
   end
   
+end
+
+rescue
+	exit -1
 end

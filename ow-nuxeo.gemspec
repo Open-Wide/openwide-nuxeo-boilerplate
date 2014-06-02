@@ -4,7 +4,7 @@ Gem::Specification.new do |s|
   s.summary = %q{A script for creating and manipulating Nuxeo projects}
   s.description = %q{Eases common tasks for Nuxeo integrators, from creating a project from scratch to building and launching it.}
   
-  s.version            = "0.3.1"
+  s.version            = "0.4.0"
   s.date = Date.today.to_s
   
   s.authors = ["Marwane Kalam-Alami"]
