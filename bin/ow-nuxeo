@@ -32,11 +32,11 @@ def putHeader(title)
   puts '=' * title.length
 end
 
-def runCommand(title, command)
+def runCommand(title, command, ignoreFailure=false)
   putHeader 'Running: ' + title + ''
   puts '> ' + command
   puts
-  if !system(command)
+  if !system(command) && !ignoreFailure
     putHeader 'ERROR: A command failed. Aborting.'
     raise 'failed system command'
   end
@@ -182,7 +182,7 @@ ARGV.each do |arg|
       system('chmod +x ' + nuxeoctlPath)
       
       runCommand('Uninstall package "' + MARKETPLACE_PACKAGE_NAME + '"',
-        nuxeoctlPath + ' --accept=true --nodeps mp-remove ' + MARKETPLACE_PACKAGE_NAME)
+        nuxeoctlPath + ' --accept=true --nodeps mp-remove ' + MARKETPLACE_PACKAGE_NAME, true)
       runCommand('Install new marketplace package', 
         nuxeoctlPath + ' --accept=true --nodeps mp-install ' + Dir[MARKETPLACE_PROJECT_PATH + '/target/' + MARKETPLACE_PROJECT_PATH.split('/').last + '-*.zip'][0])
      
@@ -194,24 +194,30 @@ ARGV.each do |arg|
       system(command)
     
     when 'reset'
-      putHeader 'Nuxeo data reset'
-      print "Delete all Nuxeo data ? (y/n, default is 'n') >> "
-      case STDIN.gets.strip.downcase
-        when 'y'
-          if defined? NUXEO_PATH
-            dataPath = NUXEO_PATH + 'nxserver/data/'
-            deletePaths = Dir[dataPath + 'h2', dataPath + 'derby', dataPath + 'binaries']
-          end
-          if !deletePaths.nil? and deletePaths.size > 0
-            puts '> Deleting Nuxeo data...'
-            FileUtils.rm_r deletePaths, :force => true
-            puts 'Done.'
-          else
-            puts 'Nothing to delete.'
-          end
-        else
-          puts "Aborted."
-      end
+	  putHeader 'Nuxeo data reset'
+      if defined? NUXEO_PATH
+		dataPath = NUXEO_PATH + 'nxserver/data/'
+		deletePaths = Dir[dataPath + 'h2', dataPath + 'derby', dataPath + 'binaries', dataPath + 'elasticsearch']
+	    if !deletePaths.nil? and deletePaths.size > 0
+			puts "Folders to be deleted:"
+			for path in deletePaths
+				puts "- " + path
+			end
+			print "Confirm? (y/n, default is 'n') >> "
+			case STDIN.gets.strip.downcase
+				when 'y'
+					puts '> Deleting Nuxeo data...'
+					FileUtils.rm_r deletePaths, :force => true
+					puts 'Done.'
+				else
+				  puts "Aborted."
+			end
+		else
+		  puts 'Nothing to delete.'
+		end
+	  else
+		puts "Nuxeo path not set, aborting."
+	  end
       
     # Project generation
     # ==================
