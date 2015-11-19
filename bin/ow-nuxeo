@@ -71,6 +71,7 @@ def displayHelp()
   puts 'deploy         : Deploy the marketplace package to your instance'
   puts 'run            : Run Nuxeo in console mode'
   puts 'reset          : Resets the data of your Derby/H2 server (if you\'re using an external database, it will only purge the binaries)'
+  puts 'nuxeoctl [...] : Run ./nuxeoctl, appending all further arguments to the command'
   puts ''
   puts '* AVAILABLE GOALS > MISC'
   puts 'version        : Displays ow-nuxeo version'
@@ -218,6 +219,15 @@ ARGV.each do |arg|
 	  else
 		puts "Nuxeo path not set, aborting."
 	  end
+
+    when 'nuxeoctl'
+      ARGV.shift
+      command = nuxeoctlPath() + ' ' + ARGV.join(' ')
+      putHeader 'Custom Nuxeo command'
+      puts '> ' + command
+      puts
+      system(command)
+      exit 0
       
     # Project generation
     # ==================
