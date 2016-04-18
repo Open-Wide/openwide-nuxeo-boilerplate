@@ -19,10 +19,12 @@
 
 		<!-- Add package bundles -->
 		<copy todir="${outdir}/marketplace/install/bundles">
-			<artifact:resolveFile key="fr.openwide.nuxeo.commons:openwide-nuxeo-constants::jar" />
-			<artifact:resolveFile key="fr.openwide.nuxeo.commons:openwide-nuxeo-utils::jar" />
-#if($hasStudioProject != 'false')<artifact:resolveFile key="${studioProjectGroupId}:${studioProjectArtifactId}::jar" />#end
-            <artifact:resolveFile key="${groupId}:${rootArtifactId}-core::jar" />
+			<artifact:resolveFile key="fr.openwide.nuxeo.commons:owsi-nuxeo-constants::jar" />
+			<artifact:resolveFile key="fr.openwide.nuxeo.commons:owsi-nuxeo-utils::jar" />
+#if($hasStudioProject != 'false')			
+			<artifact:resolveFile key="${studioProjectGroupId}:${studioProjectArtifactId}::jar" />
+#end			
+			<artifact:resolveFile key="${groupId}:${rootArtifactId}-core::jar" />
 			<artifact:resolveFile key="${groupId}:${rootArtifactId}-web::jar" />
 		</copy>
 

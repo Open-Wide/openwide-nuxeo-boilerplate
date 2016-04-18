@@ -1,0 +1,20 @@
+# Local configuration
+nuxeo-config.rb
+
+# Build output
+bin/
+target/
+
+# Temp
+*~
+*.~lock*
+*.log
+*.out
+*.releaseBackup
+*.versionsBackup
+
+# Eclipse
+.project
+.classpath
+.settings/
+.metadata/

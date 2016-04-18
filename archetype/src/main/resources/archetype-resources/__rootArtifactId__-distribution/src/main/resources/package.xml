@@ -9,25 +9,13 @@
   <production-state>testing</production-state>
   <supported>false</supported>
   
-  #set($nuxeoVersionWithoutHotfix = $nuxeoVersion.split('-').get(0))
+  #set($nuxeoVersionWithoutHotfix = $nuxeoVersion.replaceAll('-.*', ''))
   <platforms>
-    #if($nuxeoVersion.indexOf('5.6') == 0)
-    <platform>cap-5.6</platform>
-    #elseif($nuxeoVersion.indexOf('5.5') == 0)
-    <platform>cap-5.5</platform>
-    #else
     <platform>cap-${nuxeoVersionWithoutHotfix}</platform>
-    #end
   </platforms>
   <dependencies>
     <dependencies>
-      #if($nuxeoVersion.indexOf('5.6') == 0)
-      <package>nuxeo-dm-5.6.0</package>
-      #elseif($nuxeoVersion.indexOf('5.5') == 0)
-      <package>nuxeo-dm-5.5.0</package>
-      #else
       <package>nuxeo-dm-${nuxeoVersionWithoutHotfix}</package>
-      #end
     </dependencies>
   </dependencies>
 </package>
